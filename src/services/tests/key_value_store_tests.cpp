@@ -177,7 +177,7 @@ TEST(key_value_store, contains_in_set) {
 
 
   // I have not something similar to get_list  or get for sets...
-  EXPECT_EQ(store.contains_in_set("k1", 1234), false);
+  EXPECT_EQ(store.contains_in_set("k1", 1234), true);
   EXPECT_EQ(store.contains_in_set("k1", 3333), true);
   EXPECT_EQ(store.contains_in_set("k1", 87878), true);
   EXPECT_EQ(store.contains_in_set("k1", 10000), false);
