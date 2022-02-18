@@ -23,38 +23,46 @@ namespace adl::axp::core::event_processing::details {
 void BaseStage::register_source(std::string_view source_name, ISource *source) {
   const auto&[_, success] = _sources.try_emplace(std::string(source_name), source);
   if (!success)
-    throw SourceExistException(std::string("[") + _name + "] Source with the name " + std::string(source_name) + " already exists");
+    throw SourceExistException(
+        std::string("[") + _name + "] Source with the name " + std::string(source_name) + " already exists");
 }
 
 void BaseStage::register_sink(std::string_view sink_name, ISink *sink) {
   const auto&[_, success] = _sinks.try_emplace(std::string(sink_name), sink);
   if (!success)
-    throw SinkExistException(std::string("[") + _name + "] Sink with the name " + std::string(sink_name) + " already exists");
+    throw SinkExistException(
+        std::string("[") + _name + "] Sink with the name " + std::string(sink_name) + " already exists");
 }
 
 ISink *BaseStage::get_sink(std::string_view name) {
   const auto &ite = _sinks.find(name);
   if (ite != _sinks.end()) {
     return ite->second;
-  } else throw SinkDoesNotExistException(std::string("[") + _name + "]" + "No sink found by the name " + std::string(name));
+  } else
+    throw SinkDoesNotExistException(std::string("[") + _name + "]" + "No sink found by the name " + std::string(name));
 }
 const ISink *BaseStage::get_sink(std::string_view name) const {
   const auto &ite = _sinks.find(name);
   if (ite != _sinks.end()) {
     return ite->second;
-  } else throw SinkDoesNotExistException(std::string("[") + _name + "]" + "No sink found by the name " + std::string(name));
+  } else
+    throw SinkDoesNotExistException(std::string("[") + _name + "]" + "No sink found by the name " + std::string(name));
 }
 ISource *BaseStage::get_source(std::string_view name) {
   const auto &ite = _sources.find(name);
   if (ite != _sources.end()) {
     return ite->second;
-  } else throw SourceDoesNotExistException(std::string("[") + _name + "]" + "No source found by the name " + std::string(name));
+  } else
+    throw SourceDoesNotExistException(
+        std::string("[") + _name + "]" + "No source found by the name " + std::string(name));
 }
 const ISource *BaseStage::get_source(std::string_view name) const {
   const auto &ite = _sources.find(name);
   if (ite != _sources.end()) {
     return ite->second;
-  } else throw SourceDoesNotExistException(std::string("[") + _name + "]" + "No source found by the name " + std::string(name));
+  } else
+    throw SourceDoesNotExistException(
+        std::string("[") + _name + "]" + "No source found by the name " + std::string(name));
 }
 
 }

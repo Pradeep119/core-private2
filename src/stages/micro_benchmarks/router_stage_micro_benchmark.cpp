@@ -76,7 +76,7 @@ class TwoWayRouterBenchmarkFixture : public benchmark::Fixture {
 };
 
 BENCHMARK_F(TwoWayRouterBenchmarkFixture, Routing)(benchmark::State &st) {
-  for (auto _: st) {
+  for (auto _ : st) {
     _input_sink->on_message(&_msg_1);
     _input_sink->on_message(&_msg_2);
   }

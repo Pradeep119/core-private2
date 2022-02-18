@@ -50,6 +50,8 @@ class UdpServerStage : public event_processing::details::BaseStage {
       _socket(io_context) {
 
     register_source("udp_data_out", &_udp_data_out);
+    _logger = spdlog::get(std::string(name));
+
   }
 
   void start() override {
@@ -66,7 +68,7 @@ class UdpServerStage : public event_processing::details::BaseStage {
       async_receive();
 
     } catch (const std::runtime_error &ex) {
-      std::cout << ex.what() << std::endl; //TODO: log
+      _logger->error(ex.what()); //TODO: log
     }
   }
 
@@ -74,7 +76,7 @@ class UdpServerStage : public event_processing::details::BaseStage {
     _socket.async_receive_from(
         boost::asio::buffer(_buffer, _buffer_size), _sender_endpoint, [this](const boost::system::error_code &error,
                                                                              size_t bytes_received) {
-          std::cout << "received data" << std::endl;
+          this->_logger->info("received data");
           async_receive();
         });
   }
@@ -92,6 +94,8 @@ class UdpServerStage : public event_processing::details::BaseStage {
 
   constexpr static size_t _buffer_size = 1024;
   std::array<char, _buffer_size> _buffer;
+
+  std::shared_ptr<spdlog::logger> _logger;
 };
 
 }

@@ -20,6 +20,7 @@
 #include <stdexcept>
 
 #include "../foundation/extensions.h"
+#include "spdlog/spdlog.h"
 
 namespace adl::axp::core::event_processing {
 

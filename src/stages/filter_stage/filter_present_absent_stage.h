@@ -52,11 +52,12 @@ class FilterPresentAbsentStage :
     register_source("out", &_out);
     register_source("filtered", &_filtered);
     register_source("exception_out", &_exception_out);
+    _logger = spdlog::get(std::string(name));
   }
 
   void on_message(event_processing::IMessage *message) noexcept {
 
-    std::cout << "running " << (if_present ? "whitelisting " : "blacklisting") << std::endl;
+    _logger->info("running {}", (if_present ? "whitelisting " : "blacklisting"));
 
     auto *dynamic_message = static_cast<core::event_processing::DynamicMessage *>(message);
     try {
@@ -81,15 +82,15 @@ class FilterPresentAbsentStage :
 
         // if_present =1 >> whitelist
         if (if_present && !value_in_set) {
-          std::cout << "source name : filtered" << std::endl;
+          _logger->info("source name : filtered");
           filtered = true;
         } else if (!if_present && value_in_set) {
-          std::cout << "source name : filtered" << std::endl;
+          _logger->info("source name : filtered");
           filtered = true;
         }
       }
 
-      std::cout << (filtered ? "filtered" : "not filtered") << std::endl;
+      _logger->info((filtered ? "filtered" : "not filtered"));
       filtered ? _filtered.get_sink()->on_message(message) : _out.get_sink()->on_message(message);
 
     } catch (const core::services::store_services::KeyDoesNotExistException &e) {
@@ -98,13 +99,14 @@ class FilterPresentAbsentStage :
                                                        "FilterPresentAbsentStage",
                                                        e.what());
 
-      std::cout << "source name : exception out" << e.what() << std::endl;
+      _logger->critical("source name : exception out", e.what());
+
       _exception_out.get_sink()->on_message(message);
     } catch (const std::exception &e) {
       dynamic_message->template set_field<std::string>("exceptions",
                                                        "FilterPresentAbsentStage",
                                                        e.what());
-      std::cout << "source name : exception out " << e.what() << std::endl;
+      _logger->critical("source name : exception out", e.what());
       _exception_out.get_sink()->on_message(message);
     }
   }
@@ -117,6 +119,7 @@ class FilterPresentAbsentStage :
   event_processing::details::BaseSource _exception_out;
 
   const field_combination_t _field_combinations;
+  std::shared_ptr<spdlog::logger> _logger;
 };
 
 using WhitelistingStage = FilterPresentAbsentStage<true>;

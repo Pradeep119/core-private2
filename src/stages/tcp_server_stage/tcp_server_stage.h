@@ -91,29 +91,30 @@ class TcpServerStage : public event_processing::details::BaseStage,
       _port(port) {
     register_source("tcp_request_out", &_tcp_request_out);
     register_sink("tcp_response_in", this);
+    _logger = spdlog::get(std::string(name));
   }
 
   void start() override {
     try {
       _acceptor = std::make_unique<ip::tcp::acceptor>(_io_context, ip::tcp::endpoint(ip::tcp::v4(), _port));
     } catch (const std::runtime_error &ex) {
-      std::cout << ex.what() << std::endl; //TODO: log
+      _logger->error(ex.what());
     }
     async_accept_next();
   }
 
   void on_message(core::event_processing::IMessage *message) noexcept override {
-
-    auto handler = [message]() {
+    const auto &logger = this->_logger;
+    auto handler = [message, &logger]() {
       auto *response = static_cast<TcpResponseMessage *>(message);
       //TODO: after a disconnection, this object may become invalid
       auto *socket = reinterpret_cast<asio::ip::tcp::socket *>(response->get_request()->get_user_data());
       asio::async_write(*socket,
                         asio::buffer(response->get_str_response()),
-                        [](const boost::system::error_code &error, std::size_t bytes_transferred) {
+                        [&logger](const boost::system::error_code &error, std::size_t bytes_transferred) {
                           if (error) {
                             //TODO: handle error
-                            std::cout << "error sending the TCP response" << std::endl;
+                            logger->error("error sending the TCP response");
                           }
                         });
     };
@@ -141,7 +142,7 @@ class TcpServerStage : public event_processing::details::BaseStage,
                                                      [this, buff, tcp_connection](const boost::system::error_code &error,
                                                                                   std::size_t bytes_transferred) {
                                                        if (error) {
-                                                         std::cout << "tcp read error " << error.message() << std::endl;
+                                                         this->_logger->error("tcp read error {}", error.message());
                                                        }
                                                        // call assembler to get messages
                                                        std::list<TcpRequestMessage *> messages =
@@ -149,7 +150,7 @@ class TcpServerStage : public event_processing::details::BaseStage,
                                                                                                        bytes_transferred,
                                                                                                        tcp_connection);
 
-                                                       for (auto message: messages) {
+                                                       for (auto message : messages) {
                                                          message->set_user_data(&tcp_connection->_socket);
                                                          _tcp_request_out.get_sink()->on_message(message);
                                                        }
@@ -164,10 +165,10 @@ class TcpServerStage : public event_processing::details::BaseStage,
 
       if (error) {
         //TODO:
-        std::cout << "error " << error.message() << std::endl;
+        _logger->error("error {}", error.message());
       } else {
         // start a new async read
-        std::cout << "new connection" << std::endl;
+        _logger->info("new connection");
         async_read(tcp_connection);
         async_accept_next();
       }
@@ -181,5 +182,6 @@ class TcpServerStage : public event_processing::details::BaseStage,
   const int _port;
   std::unique_ptr<ip::tcp::acceptor> _acceptor;
   std::list<std::unique_ptr<TCPConnection>> _tcp_connections;
+  std::shared_ptr<spdlog::logger> _logger;
 };
 }

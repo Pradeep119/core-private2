@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
 
-
-
 add_executable(stages_test
         message_augmentor_tests.cpp
         ../../event_processing/base_impl/base_stage.cpp

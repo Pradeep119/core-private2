@@ -64,7 +64,7 @@ void ThrottleStateBuilderStage::on_message(event_processing::IMessage *message) 
   // shows whether the message was throttled or not
   const auto &throttle_state = dynamic_message->get_field<std::string>("throttling", "state");
 
-  for (const auto &field_name: _lookup_filed_names) {
+  for (const auto &field_name : _lookup_filed_names) {
     try {
       const auto &throttler_id =
           dynamic_message->get_field<std::string>("http_info", field_name); //TODO: get the field group injected
@@ -93,7 +93,7 @@ void ThrottleStateBuilderStage::on_message(event_processing::IMessage *message) 
 
 void ThrottleStateBuilderStage::flush_updates() noexcept {
   auto *throttle_state_update_message = new ThrottleStateMessage();
-  for (const auto &throttler: _updated_throttlers) {
+  for (const auto &throttler : _updated_throttlers) {
     throttle_state_update_message->add_throttler_state(throttler.first, throttler.second);
   }
   _updated_throttlers.clear();

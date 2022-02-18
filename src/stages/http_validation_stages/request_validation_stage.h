@@ -57,6 +57,7 @@ class HttpRequestValidationStage : public event_processing::details::BaseStage,
   // sources/sinks
   event_processing::details::BaseSource _valid_requests_out;
   event_processing::details::BaseSource _invalid_requests_out;
+  std::shared_ptr<spdlog::logger> _logger;
 
 };
 }

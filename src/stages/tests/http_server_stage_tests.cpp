@@ -90,32 +90,27 @@ TEST(query_parameter, extration_10) {
   EXPECT_EQ(extract_query(query_test)["8"] == "%26", true);
   EXPECT_EQ(extract_query(query_test)["?"] == "u7", true);
 }
-TEST(http_validations, path_parameter_extraction){
+TEST(http_validations, path_parameter_extraction) {
   const auto resource_path1 = "test_1/:path_param_0/mock/:path_param_1";
   const auto resource_path1_path_params = extract_path_parameters(resource_path1);
 
-  EXPECT_EQ(resource_path1_path_params[0]=="path_param_0",true);
-  EXPECT_EQ(resource_path1_path_params[1]=="path_param_1",true);
+  EXPECT_EQ(resource_path1_path_params[0] == "path_param_0", true);
+  EXPECT_EQ(resource_path1_path_params[1] == "path_param_1", true);
 
   const auto resource_path2 = "test_1/:p0/mock/:p1/:p2/:p4/:p3/:p10";
   const auto resource_path2_path_params = extract_path_parameters(resource_path2);
 
-  EXPECT_EQ(resource_path2_path_params[0]=="p0",true);
-  EXPECT_EQ(resource_path2_path_params[1]=="p1",true);
-  EXPECT_EQ(resource_path2_path_params[2]=="p2",true);
-  EXPECT_EQ(resource_path2_path_params[3]=="p4",true);
-  EXPECT_EQ(resource_path2_path_params[4]=="p3",true);
-  EXPECT_EQ(resource_path2_path_params[5]=="p10",true);
+  EXPECT_EQ(resource_path2_path_params[0] == "p0", true);
+  EXPECT_EQ(resource_path2_path_params[1] == "p1", true);
+  EXPECT_EQ(resource_path2_path_params[2] == "p2", true);
+  EXPECT_EQ(resource_path2_path_params[3] == "p4", true);
+  EXPECT_EQ(resource_path2_path_params[4] == "p3", true);
+  EXPECT_EQ(resource_path2_path_params[5] == "p10", true);
 
   const auto resource_path3 = "/";
   const auto resource_path3_path_params = extract_path_parameters(resource_path3);
 
-  EXPECT_EQ(resource_path3_path_params.empty()== true,true);
-
-
-
-
-
+  EXPECT_EQ(resource_path3_path_params.empty() == true, true);
 
 }
 

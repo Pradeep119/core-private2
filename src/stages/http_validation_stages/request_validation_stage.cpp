@@ -21,6 +21,7 @@
 namespace adl::axp::core::stages::http::validation {
 
 namespace {
+
 bool evaluate_validity(const auto &http_req_message,
                        const auto &validator,
                        const auto &header_typed_group_name,
@@ -83,6 +84,7 @@ HttpRequestValidationStage::HttpRequestValidationStage(std::string_view name,
   register_source("valid_requests_out", &_valid_requests_out);
   register_source("invalid_requests_out", &_invalid_requests_out);
   register_sink("in", this);
+  HttpRequestValidationStage::_logger = spdlog::get(std::string(name));
 }
 
 void HttpRequestValidationStage::on_message(event_processing::IMessage *message) noexcept {
@@ -90,7 +92,7 @@ void HttpRequestValidationStage::on_message(event_processing::IMessage *message)
   auto *http_req_message = static_cast<core::event_processing::messages::HttpRequestMessage *>(message);
   const auto &validator_lookup_group = _validator_key_combinations.first;
   const auto &validator_lookup_field = _validator_key_combinations.second;
-  auto validator = get_validation_spec(http_req_message,_store,validator_lookup_group, validator_lookup_field);
+  auto validator = get_validation_spec(http_req_message, _store, validator_lookup_group, validator_lookup_field);
 
   const auto &header_typed_group_name = _header_combinations;
   const auto &path_typed_group_name = _path_combinations;
@@ -103,8 +105,7 @@ void HttpRequestValidationStage::on_message(event_processing::IMessage *message)
                                  path_typed_group_name,
                                  query_typed_group_name);
   }
-
-  validity ? std::cout << "Http validation Success" << std::endl : std::cout << "Http validation Failed" << std::endl;
+  HttpRequestValidationStage::_logger->info(validity ? "Http validation Success" : "Http validation Failed");
   validity ? _valid_requests_out.get_sink()->on_message(message) : _invalid_requests_out.get_sink()->on_message(
       message);
 }

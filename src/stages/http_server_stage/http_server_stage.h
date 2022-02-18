@@ -149,16 +149,18 @@ class HttpServerStage : public event_processing::details::BaseStage,
       const auto resource_path = config_message->get_resource();
       const auto method = config_message->get_method();
       const auto path_parameter_vector = extract_path_parameters(resource_path);
+      const auto logger = _server_stage._logger;
 
       _server_stage._server->get(std::string(resource_path),
                                  [route_key_1,
                                      route_key_2,
                                      resource_path,
                                      method,
-                                     path_parameter_vector, this](uWS::HttpResponse<true> *uws_response,
-                                                                  uWS::HttpRequest *uws_request) {
-
-                                   std::cout << "...................................." << std::endl;
+                                     path_parameter_vector,
+                                     logger,
+                                     this](uWS::HttpResponse<true> *uws_response,
+                                           uWS::HttpRequest *uws_request) {
+                                   logger->info("........A new Request.........");
                                    //print(uws_request);
 
 //                                   _server_stage._http_request_counter->add(1, _server_stage._kvite);
@@ -241,8 +243,8 @@ class HttpServerStage : public event_processing::details::BaseStage,
                                    // TODO: params and body
                                    uws_response->onWritable([uws_response](int offset) {
                                      return true;
-                                   })->onAborted([] {
-//                                     std::cout << "On aborted" << std::endl;
+                                   })->onAborted([logger] {
+                                     logger->warn("On aborted");
                                    })->onData([this, message](std::string_view data, bool last) {
                                      //      std::cout << data << last << std::endl;
                                      //TODO: append the message with new data
@@ -281,6 +283,7 @@ class HttpServerStage : public event_processing::details::BaseStage,
 
    private:
     HttpServerStage &_server_stage;
+    std::shared_ptr<spdlog::logger> logger;
   };
 
  public:
@@ -303,6 +306,7 @@ class HttpServerStage : public event_processing::details::BaseStage,
     register_sink("http_response_in", this);
 
     register_sink("configuration_in", &_configuration_in);
+    _logger = spdlog::get(std::string(name));
   }
 
   // This method MUST be called from the event loop thread
@@ -316,8 +320,7 @@ class HttpServerStage : public event_processing::details::BaseStage,
 
     _server->listen(_port, [this](auto *listen_socket) {
       if (listen_socket) {
-        //TODO:Use logs instead of std::cout
-        std::cout << "Listening on port " << _port << std::endl;
+        _logger->info("Listening on port {}", _port);
       }
     });
 
@@ -357,11 +360,14 @@ class HttpServerStage : public event_processing::details::BaseStage,
       //TODO: remove hardcoding
       uws_reponse->writeStatus("429 Too Many Requests");
       uws_reponse->end(response->get_body());
-      std::cout << "sent 500 response " << std::endl;
+//      _logger->info("sent {} response ",500);
     } else {
       uws_reponse->end(response->get_body());
     }
   }
+
+ protected:
+  std::shared_ptr<spdlog::logger> _logger;
 
  private:
 // sources and sinks

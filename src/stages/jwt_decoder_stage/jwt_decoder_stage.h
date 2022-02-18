@@ -53,10 +53,10 @@ class JwtDecoderStage : public event_processing::ISink, public event_processing:
        * claims are not fixed though
        * -- In that case we may need to end up with fixed policy or
        * couple of alternative policies to do the filtering*/
-      for (const auto &e2: decoded_token.get_header_claims()) {
+      for (const auto &e2 : decoded_token.get_header_claims()) {
         dynamic_message->set_field<std::string>("jwt decoding", e2.first, e2.second.as_string());
       }
-      for (const auto &e1: decoded_token.get_payload_claims()) {
+      for (const auto &e1 : decoded_token.get_payload_claims()) {
         dynamic_message->set_field<std::string>("jwt decoding", e1.first, e1.second.to_json().to_str());
         //Here some claims are having different types like time ; Tried different
         // things.   Only this worked. Actually otherwise it is throwing an exception due to conversion error.

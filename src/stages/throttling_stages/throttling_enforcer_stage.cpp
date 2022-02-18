@@ -42,7 +42,7 @@ void ThrottlingEnforcerStage::on_message(core::event_processing::IMessage *messa
   // otherwise send it through throttled out
 
   auto *dynamic_message = static_cast<event_processing::DynamicMessage *>(message);
-  for (const auto &field_name: _lookup_filed_names) {
+  for (const auto &field_name : _lookup_filed_names) {
     const auto &throttler_id =
         dynamic_message->get_field<std::string>("http_info", field_name); //TODO: get the field group injected
     // TODO: we may have to use a postfix
@@ -69,7 +69,7 @@ void ThrottlingEnforcerStage::on_message(core::event_processing::IMessage *messa
 void ThrottlingEnforcerStage::on_throttle_state_message(event_processing::IMessage *message) noexcept {
 
   const auto *throttler_state_message = static_cast<ThrottleStateMessage *>(message);
-  for (const auto &state: throttler_state_message->get_state()) {
+  for (const auto &state : throttler_state_message->get_state()) {
     const auto&[throttler_id, throttler_state] = state;
     _throttler_states[throttler_id] = throttler_state;
   }

@@ -20,6 +20,7 @@
 
 #include "../../event_processing/base_impl/base_stage.h"
 #include "../../event_processing/sink.h"
+#include "../../event_processing/base_impl/base_source.h"
 
 /**
  * Introduces a delay from in to out.

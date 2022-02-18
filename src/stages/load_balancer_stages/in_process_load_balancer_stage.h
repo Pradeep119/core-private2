@@ -15,7 +15,11 @@
 
 #pragma once
 
+#include <atomic>
+#include <array>
 #include "../../event_processing/sink.h"
+#include "../../event_processing/base_impl/base_source.h"
+#include "../../event_processing/base_impl/base_stage.h"
 
 namespace adl::axp::core::stages::load_balancers {
 

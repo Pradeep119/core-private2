@@ -48,7 +48,7 @@ class MessageAugmentorStage : public event_processing::details::BaseStage,
   void on_message(core::event_processing::IMessage *message) noexcept override {
     // TODO: handle exceptions
     auto *dynamic_message = static_cast<event_processing::DynamicMessage *>(message);
-    for (const auto &augmentor: _augmentors) {
+    for (const auto &augmentor : _augmentors) {
       (*augmentor)(dynamic_message);
     }
     _message_out.get_sink()->on_message(message);

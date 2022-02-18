@@ -16,6 +16,7 @@
 #pragma once
 
 #include <string>
+#include <iostream>
 
 #include "../../event_processing/sink.h"
 
@@ -31,7 +32,9 @@ class PrintingSink : public event_processing::ISink {
   }
 
   void on_message(event_processing::IMessage *message) noexcept override {
-    std::cout << _prefix << std::endl; //TODO: print message content
+    std::cout << _prefix << std::endl;
+    //TODO: insert this to the logger
+    //TODO: print message content
   }
 
  private:

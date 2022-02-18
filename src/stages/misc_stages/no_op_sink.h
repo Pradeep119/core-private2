@@ -24,7 +24,7 @@ namespace adl::axp::core::stages::misc { //TODO: change namespace
 
 class NoOpSink : public event_processing::ISink {
  public:
-  void on_message(event_processing::IMessage* message) noexcept override {
+  void on_message(event_processing::IMessage *message) noexcept override {
 
   }
 };

@@ -55,7 +55,7 @@ TEST(dyna_message, two_groups) {
 TEST(dyna_message, single_field_typed_group) {
   DynamicMessage msg;
 
-  msg.create_typed_group<std::int32_t >("grp");
+  msg.create_typed_group<std::int32_t>("grp");
   msg.set_typed_field("grp", "name1", 1);
   msg.set_typed_field("grp", "name2", 2);
 
@@ -66,7 +66,7 @@ TEST(dyna_message, single_field_typed_group) {
 TEST(dyna_message, single_field_typed_group_overwrite) {
   DynamicMessage msg;
 
-  msg.create_typed_group<std::int32_t >("grp");
+  msg.create_typed_group<std::int32_t>("grp");
   msg.set_typed_field("grp", "name1", 1);
   msg.set_typed_field("grp", "name2", 2);
   msg.set_typed_field("grp", "name2", 5);
@@ -78,10 +78,10 @@ TEST(dyna_message, single_field_typed_group_overwrite) {
 TEST(dyna_message, group_iteration_single_item) {
   DynamicMessage msg;
 
-  msg.create_typed_group<std::int32_t >("grp");
+  msg.create_typed_group<std::int32_t>("grp");
   msg.set_typed_field("grp", "name1", 1);
 
-  auto [begin, end] = msg.get_typed_group<int32_t >("grp");
+  auto[begin, end] = msg.get_typed_group<int32_t>("grp");
   EXPECT_EQ("name1", (*begin).first);
   EXPECT_EQ(1, (*begin).second);
   ++begin;
@@ -94,12 +94,12 @@ TEST(dyna_message, group_iteration_multi_item) {
   msg.set_typed_field("grp", "test", 1);
   msg.set_typed_field("grp", "test2", 2);
 
-  auto [begin, end] = msg.get_typed_group<std::int32_t>("grp");
-  std::for_each(begin, end, [](const auto& pair) {
-    if(pair.first == "test") {
+  auto[begin, end] = msg.get_typed_group<std::int32_t>("grp");
+  std::for_each(begin, end, [](const auto &pair) {
+    if (pair.first == "test") {
       EXPECT_EQ(1, pair.second);
     }
-    if(pair.first == "test2") {
+    if (pair.first == "test2") {
       EXPECT_EQ(2, pair.second);
     }
   });

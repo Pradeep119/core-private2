@@ -45,6 +45,7 @@ class JwtValidationStage : public event_processing::ISink, public event_processi
     register_source("expired_out", &_expired_out);
     register_source("non_jwt_out", &_non_jwt_out);
     register_sink("message_in", this);
+    _logger = spdlog::get(std::string(name));
   }
 
   void on_message(event_processing::IMessage *message) noexcept override {
@@ -59,28 +60,28 @@ class JwtValidationStage : public event_processing::ISink, public event_processi
 
       jwt_verifier.verify(jwt_decoded);
 
-      for (const auto &e2: jwt_decoded.get_header_claims()) {
+      for (const auto &e2 : jwt_decoded.get_header_claims()) {
         dynamic_message->set_field<std::string>(_decoded_group, e2.first, e2.second.as_string());
       }
-      for (const auto &e1: jwt_decoded.get_payload_claims()) {
+      for (const auto &e1 : jwt_decoded.get_payload_claims()) {
         dynamic_message->set_field<std::string>(_decoded_group, e1.first, e1.second.to_json().to_str());
       }
       _valid_out.get_sink()->on_message(message);
     }
     catch (jwt::error::token_verification_exception e) {
-      std::cout << "Expired JWT access token" << std::endl;
+      _logger->error("Expired JWT access token");
       _expired_out.get_sink()->on_message(message);
     }
     catch (std::invalid_argument e) {
-      std::cout << "Non JWT access token" << std::endl;
+      _logger->error("Non JWT access token");
       _non_jwt_out.get_sink()->on_message(message);
     }
     catch (jwt::error::signature_verification_exception e) {
-      std::cout << "Invalid JWT access token" << std::endl;
+      _logger->error("Invalid JWT access token");
       _invalid_out.get_sink()->on_message(message);
     }
     catch (std::runtime_error e) {
-      std::cout << "Invalid JWT access token" << std::endl;
+      _logger->error("Invalid JWT access token");
       _invalid_out.get_sink()->on_message(message);
     }
   }
@@ -94,6 +95,8 @@ class JwtValidationStage : public event_processing::ISink, public event_processi
   const field_combination_t _token_field;
   const std::string _decoded_group;
   const std::string _rsa_public_key;
+
+  std::shared_ptr<spdlog::logger> _logger;
 };
 
 }
